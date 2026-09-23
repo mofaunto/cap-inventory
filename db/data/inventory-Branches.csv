@@ -1,0 +1,4 @@
+ID,code,name,city,country,managerEmail
+1,BR-01,Main Warehouse,Tashkent,Uzbekistan,manager.tashkent@test.com
+2,BR-02,North Branch,Navoi,Uzbekistan,manager.navoi@test.com
+3,BR-03,South Branch,Termiz,Uzbekistan,manager.termiz@test.com

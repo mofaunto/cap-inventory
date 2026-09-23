@@ -1,0 +1,6 @@
+ID,sku,name,category,unit,unitPrice,reorderLevel,active
+1,SKU-1001,Wireless Mouse,Electronics,pc,25.50,10,true
+2,SKU-1002,Mechanical Keyboard,Electronics,pc,89.99,5,true
+3,SKU-1003,USB-C Cable,Accessories,pc,12.00,20,true
+4,SKU-1004,Monitor 24",Electronics,pc,150.00,3,true
+5,SKU-1005,Desk Lamp,Furniture,pc,35.00,8,true
