@@ -1,4 +1,5 @@
 import cds from '@sap/cds';
+import { getEurToUsd } from './lib/frankfurter.js';
 
 const ALLOWED_TRANSITIONS = {
   DRAFT:     ['SUBMITTED'],
@@ -15,6 +16,12 @@ export default class InventoryService extends cds.ApplicationService {
 
     this.before('CREATE', StockRequests, async (req) => {
       this.validateStockRequest(req);
+
+      if (req.data.ID == null) {
+        const maxRow = await SELECT.one`max(ID) as maxID`.from('inventory.StockRequests');
+        req.data.ID = (maxRow?.maxID ?? 0) + 1;
+      }
+
       Object.assign(req.data, await this.computeDerivedFields(req.data));
     });
 
@@ -73,6 +80,11 @@ export default class InventoryService extends cds.ApplicationService {
       const product = await SELECT.one.from('inventory.Products').where({ ID: product_ID });
       if (product) {
         result.estimatedCost = Number((quantity * product.unitPrice).toFixed(2));
+
+        const rate = await getEurToUsd();
+        if (rate != null) {
+          result.estimatedCostUSD = Number((result.estimatedCost * rate).toFixed(2));
+        }
       }
     }
 
