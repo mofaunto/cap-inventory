@@ -9,10 +9,18 @@ const ALLOWED_TRANSITIONS = {
   FULFILLED: [],
 };
 
+const MANAGER_ONLY_STATUSES = ['APPROVED', 'REJECTED', 'FULFILLED'];
+
 export default class InventoryService extends cds.ApplicationService {
 
   async init() {
     const { StockRequests } = this.entities;
+
+    this.before('READ', StockRequests, (req) => {
+      if (!req.user.is('manager') && !req.user.is('admin')) {
+        req.query.where({ requestedBy: req.user.id });
+      }
+    });
 
     this.before('CREATE', StockRequests, async (req) => {
       this.validateStockRequest(req);
@@ -21,6 +29,9 @@ export default class InventoryService extends cds.ApplicationService {
         const maxRow = await SELECT.one`max(ID) as maxID`.from('inventory.StockRequests');
         req.data.ID = (maxRow?.maxID ?? 0) + 1;
       }
+
+      req.data.requestedBy = req.user.id;
+      req.data.requestedAt = new Date().toISOString();
 
       Object.assign(req.data, await this.computeDerivedFields(req.data));
     });
@@ -32,6 +43,15 @@ export default class InventoryService extends cds.ApplicationService {
 
       const existing = await SELECT.one.from(req.subject);
       if (!existing) return req.reject(404, 'Stock request not found.');
+
+      if (!req.user.is('manager') && !req.user.is('admin')) {
+        if (existing.requestedBy !== req.user.id) {
+          return req.reject(403, 'You can only update your own requests.');
+        }
+        if (existing.status !== 'DRAFT') {
+          return req.reject(403, 'You can only edit requests in DRAFT status.');
+        }
+      }
 
       const merged = { ...existing, ...req.data };
 
@@ -113,7 +133,14 @@ export default class InventoryService extends cds.ApplicationService {
       return req.reject(409, `Invalid status transition: ${from} -> ${to}.`);
     }
 
+    if (MANAGER_ONLY_STATUSES.includes(to)) {
+      if (!req.user.is('manager') && !req.user.is('admin')) {
+        return req.reject(403, `Only managers can set status to ${to}.`);
+      }
+    }
+
     if (to === 'APPROVED') {
+      req.data.approvedBy = req.user.id;
       req.data.approvedAt = new Date().toISOString();
     }
 

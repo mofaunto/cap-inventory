@@ -11,5 +11,17 @@
   "scripts": {
     "start": "cds-serve"
   },
-  "private": true
+  "private": true,
+  "cds": {
+    "requires": {
+      "auth": {
+        "kind": "mocked",
+        "users": {
+          "admin@test.com":   { "password": "pass", "roles": ["admin"] },
+          "manager@test.com": { "password": "pass", "roles": ["manager"] },
+          "clerk@test.com":   { "password": "pass", "roles": ["clerk"] }
+        }
+      }
+    }
+  }
 }
