@@ -1,13 +1,5 @@
 using { InventoryService } from './inventory-service';
 
-annotate InventoryService.Products with {
-  ID @Common.Text: name;
-};
-
-annotate InventoryService.Branches with {
-  ID @Common.Text: name;
-};
-
 annotate InventoryService.StockRequests with @(
   UI: {
     HeaderInfo: {
@@ -24,24 +16,24 @@ annotate InventoryService.StockRequests with @(
     ],
 
     LineItem: [
-      { Value: requestNumber,       Label: 'Request #' },
-      { Value: product_ID,          Label: 'Product' },
-      { Value: requestingBranch_ID, Label: 'Requesting Branch' },
-      { Value: fulfillingBranch_ID, Label: 'Fulfilling Branch' },
-      { Value: quantity,            Label: 'Qty' },
-      { Value: requestType,         Label: 'Type' },
-      { Value: status,              Label: 'Status' },
-      { Value: priority,            Label: 'Priority' },
-      { Value: estimatedCost,       Label: 'Cost (EUR)' },
-      { Value: estimatedCostUSD,    Label: 'Cost (USD)' }
+      { Value: requestNumber,        Label: 'Request #' },
+      { Value: productName,          Label: 'Product' },
+      { Value: requestingBranchName, Label: 'Requesting Branch' },
+      { Value: fulfillingBranchName, Label: 'Fulfilling Branch' },
+      { Value: quantity,             Label: 'Qty' },
+      { Value: requestType,          Label: 'Type' },
+      { Value: status,               Label: 'Status' },
+      { Value: priority,             Label: 'Priority' },
+      { Value: estimatedCost,        Label: 'Cost (EUR)' },
+      { Value: estimatedCostUSD,     Label: 'Cost (USD)' }
     ],
 
     FieldGroup #General: {
       Data: [
         { Value: requestNumber },
-        { Value: product_ID },
-        { Value: requestingBranch_ID },
-        { Value: fulfillingBranch_ID },
+        { Value: productName },
+        { Value: requestingBranchName },
+        { Value: fulfillingBranchName },
         { Value: quantity },
         { Value: requestType },
         { Value: status },

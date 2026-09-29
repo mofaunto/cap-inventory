@@ -31,6 +31,11 @@ service InventoryService {
     { grant: 'UPDATE', to: ['clerk', 'manager', 'admin'] },
     { grant: 'DELETE', to: 'admin' },
   ]
-  entity StockRequests as projection on db.StockRequests;
+  entity StockRequests as projection on db.StockRequests {
+    *,
+    product.name          as productName          : String(100),
+    requestingBranch.name as requestingBranchName : String(100),
+    fulfillingBranch.name as fulfillingBranchName : String(100)
+  };
 
 }
