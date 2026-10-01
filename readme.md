@@ -1,22 +1,38 @@
-# Getting Started
+# Inventory & Warehouse System
 
-Welcome to your new CAP project.
+SAP CAP backend, simple List Fiori.
 
-It contains these folders and files, following our recommended project layout:
+## Run
 
-File or Folder | Purpose
----------|----------
-`app/` | content for UI frontends goes here
-`db/` | your domain models and data go here
-`srv/` | your service models and code go here
-`readme.md` | this getting started guide
+    npm install
+    npx cds watch
 
-## Next Steps
+Backend: http://localhost:4004/odata/v4/inventory
+Fiori app: http://localhost:4004/stockrequests/index.html
 
-- Open a new terminal and run `cds watch`
-- (in VS Code simply choose _**Terminal** > Run Task > cds watch_)
-- Start with your domain model, in a CDS file in `db/`
+Login with any of:
 
-## Learn More
+    clerk@test.com    / pass    (create and view own requests) - Only view in the UI
+    manager@test.com  / pass    (view all, approve, reject, fulfill) - Only in API at the moment, no UI
+    admin@test.com    / pass    (full access) - Only in API at the moment, no UI
 
-Learn more at <https://cap.cloud.sap>.
+## Entities
+
+- Products   — catalog
+- Branches   — warehouses
+- Stocks     — quantity on hand per product per branch
+- StockRequests — replenishment requests with an approval workflow
+
+## Business logic
+
+- Validates request fields on create and update
+- Computes priority from the requesting branch's stock level
+- Computes estimated cost in EUR and USD (live rate from Frankfurter API)
+- Enforces status transitions: DRAFT → SUBMITTED → APPROVED/REJECTED → FULFILLED
+- Adjusts stock quantities when a request is fulfilled
+
+## Roles
+
+- clerk: read products/branches/stocks, create and edit own draft requests (API level only)
+- manager: read everything, update requests, approve/reject/fulfill (API level only)
+- admin: full access including delete (API level only)
