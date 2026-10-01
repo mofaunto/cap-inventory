@@ -1,0 +1,82 @@
+@host    = http://localhost:4004
+@service = {{host}}/odata/v4/inventory
+@clerk   = clerk@test.com:pass
+@manager = manager@test.com:pass
+@admin   = admin@test.com:pass
+
+
+### Anonymous is rejected (401)
+GET {{service}}/StockRequests
+
+
+### Clerk sees own requests
+GET {{service}}/StockRequests
+Authorization: Basic {{clerk}}
+
+
+### Manager sees all
+GET {{service}}/StockRequests
+Authorization: Basic {{manager}}
+
+
+### Create valid request (priority + EUR + USD computed)
+POST {{service}}/StockRequests
+Authorization: Basic {{clerk}}
+Content-Type: application/json
+
+{
+  "requestNumber": "REQ-T-001",
+  "product_ID": 1,
+  "requestingBranch_ID": 2,
+  "quantity": 5,
+  "requestType": "RENEW",
+  "status": "DRAFT"
+}
+
+
+### Validation failure — quantity 0 (400)
+POST {{service}}/StockRequests
+Authorization: Basic {{clerk}}
+Content-Type: application/json
+
+{
+  "requestNumber": "REQ-T-BAD",
+  "product_ID": 1,
+  "requestingBranch_ID": 2,
+  "quantity": 0,
+  "requestType": "RENEW"
+}
+
+
+### Submit own draft (200)
+PATCH {{service}}/StockRequests(4)
+Authorization: Basic {{clerk}}
+Content-Type: application/json
+
+{ "status": "SUBMITTED" }
+
+
+### Clerk cannot approve (403)
+PATCH {{service}}/StockRequests(4)
+Authorization: Basic {{clerk}}
+Content-Type: application/json
+
+{ "status": "APPROVED" }
+
+
+### Manager approves (200, approvedBy stamped)
+PATCH {{service}}/StockRequests(4)
+Authorization: Basic {{manager}}
+Content-Type: application/json
+
+{ "status": "APPROVED" }
+
+
+### Clerk cannot delete (403)
+DELETE {{service}}/StockRequests(4)
+Authorization: Basic {{clerk}}
+
+
+### Admin can delete (204)
+DELETE {{service}}/StockRequests(4)
+Authorization: Basic {{admin}}
